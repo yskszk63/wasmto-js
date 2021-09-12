@@ -1,0 +1,4 @@
+tests/example.mjs
+tests/example.wasm
+wasmto-js.mjs
+wasmto-js.wasm

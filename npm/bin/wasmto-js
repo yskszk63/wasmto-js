@@ -1,0 +1,58 @@
+#!/usr/bin/env node
+
+(async () => {
+    const { compile } = await import('../wasmto-js.mjs');
+    const fs = await import('fs');
+
+    const mod = await compile();
+    const instance = await WebAssembly.instantiate(mod, {
+        wasi_snapshot_preview1: {
+            proc_exit(rval) {
+                throw new Error(`program exit ${rval}`);
+            },
+            args_sizes_get(argc, argvBufSize) {
+                const mem = new DataView(instance.exports.memory.buffer);
+                mem.setUint32(argc, 0, true);
+                return 0;
+            },
+            args_get(argv, ptr) {
+                return 0;
+            },
+            fd_fdstat_get(fd, result) {
+                const mem = new DataView(instance.exports.memory.buffer);
+                mem.setUint8(result + 0, 2); // character device
+                mem.setUint16(result + 2, 0, true);
+                mem.setUint16(result + 4, 0, true);
+                mem.setBigUint64(result + 8, 0n, true); // TODO
+                mem.setBigUint64(result + 16, 0n, true); // TODO
+                return 0;
+            },
+            fd_write(fd, iovec, niovec, result) {
+                const mem = new DataView(instance.exports.memory.buffer);
+                let written = 0;
+                for (const ptr of Array.from({length: niovec}, (_, i) => iovec + (i * 8))) {
+                    const buf = mem.getUint32(ptr + 0, true);
+                    const len = mem.getUint32(ptr + 4, true);
+                    written += fs.writeSync(fd, mem, buf, len);
+                }
+                mem.setUint32(result, written, true);
+                return 0;
+            },
+            fd_read(fd, iovec, niovec, result) {
+                const mem = new DataView(instance.exports.memory.buffer);
+                const buf = mem.getUint32(iovec + 0, true);
+                const len = mem.getUint32(iovec + 4, true);
+                const read = fs.readSync(fd, mem, buf, len);
+                mem.setUint32(result, read, true);
+                return 0;
+            },
+            fd_seek(...args) {
+                return 0;
+            },
+            fd_close(fd) {
+                fs.closeSync(fd);
+            },
+        },
+    });
+    instance.exports._start();
+})();

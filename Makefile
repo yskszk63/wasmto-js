@@ -23,9 +23,11 @@ tests/example.wasm: tests/example.wat
 
 $(JS_BIN): $(WASM_BIN)
 	wasm-opt -Os -o - $<|wasmtime $< > $@
+	cp $@ npm
 
 $(WASM_BIN): $(SRC)
 	v -m32 -cc clang -cflags '$(CFLAGS) -o $@' -o $@ $<
+	cp $@ npm
 
 clean:
 	$(RM) $(TARGETS)
