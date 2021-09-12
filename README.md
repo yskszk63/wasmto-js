@@ -16,7 +16,7 @@ make
 
 ## License
 
-[MIT](License)
+[MIT](LICENSE)
 
 ## Author
 
