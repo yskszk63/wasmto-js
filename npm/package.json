@@ -1,6 +1,6 @@
 {
-  "name": "@yskszk63/wasmto-js",
-  "version": "0.1.4",
+  "name": "wasmto-js",
+  "version": "0.1.5",
   "description": "Transpile wasm binary to JavaScript code.",
   "main": "wasmto-js.mjs",
   "scripts": {
