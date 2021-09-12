@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf8" />
+    <title>test</title>
+  </head>
+  <body>
+    <pre></pre>
+    <script>
+console.log = function(...args) {
+    for (const arg of args) {
+        document.querySelector('pre').append(new Text(arg));
+    }
+}
+    </script>
+    <script type="module" src="./node-test.mjs"></script>
+  </body>
+</html>
