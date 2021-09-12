@@ -1,6 +1,6 @@
 {
   "name": "@yskszk63/wasmto-js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Transpile wasm binary to JavaScript code.",
   "main": "wasmto-js.mjs",
   "scripts": {
@@ -12,6 +12,9 @@
   },
   "publishConfig": {
     "registry":"https://npm.pkg.github.com"
+  },
+  "bin": {
+    "wasmto-js": "./bin/wasmto-js"
   },
   "keywords": [
     "wasm"
