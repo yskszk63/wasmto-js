@@ -1,19 +1,23 @@
-# vlang wasi build test
+# wasmto-js
 
-## HOW TO BUILD
+Transpile wasm binary to JavaScript code.
+
+## Usage
+
+```bash
+wasmtime wasmto-js.wasm < path/to/target.wasm > path/to/output.js
+```
+
+## Build
 
 ```
 make
 ```
 
-## HOW TO RUN
+## License
 
-```
-wasmtime test.wasm
-```
+[MIT](License)
 
-## Requirements
+## Author
 
-- v
-- wasi-sdk (wasi-libc)
-- wasmtime (or anything)
+yskszk63
