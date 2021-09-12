@@ -10,9 +10,6 @@
     "type": "git",
     "url": "git+https://github.com/yskszk63/wasmto-js.git"
   },
-  "publishConfig": {
-    "registry":"https://npm.pkg.github.com"
-  },
   "bin": {
     "wasmto-js": "./bin/wasmto-js"
   },
