@@ -3,13 +3,22 @@ WASI_SYSROOT = /opt/wasi-sdk/wasi-sysroot
 SRC = main.v
 WASM_BIN = wasmto-js.wasm
 JS_BIN = wasmto-js.mjs
-TARGETS = $(WASM_BIN) $(JS_BIN) tests/example.wasm tests/example.mjs
+TARGETS = $(WASM_BIN) $(JS_BIN) tests/example.wasm tests/example.mjs npm/README.md npm/$(JS_BIN) npm/$(WASM_BIN)
 
 CFLAGS = --target=wasm32-wasi --sysroot=$(WASI_SYSROOT) -I$(CURDIR)/stub -D_WASI_EMULATED_SIGNAL -lwasi-emulated-signal -DWNOHANG=1
 
 .PHONY: all clean test
 
 all: $(TARGETS)
+
+npm/README.md: README.md
+	cp $< $@
+
+npm/$(JS_BIN): $(JS_BIN)
+	cp $< $@
+
+npm/$(WASM_BIN): $(WASM_BIN)
+	cp $< $@
 
 test: tests/example.mjs
 	deno run tests/deno-test.ts
