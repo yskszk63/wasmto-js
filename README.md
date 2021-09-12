@@ -5,7 +5,7 @@ Transpile wasm binary to JavaScript code.
 ## Usage
 
 ```bash
-npx wasmto-js
+npx wasmto-js < path/to/input.wasm > path/to/output.js
 ```
 
 ## Build
