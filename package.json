@@ -1,17 +1,23 @@
 {
   "name": "wasmto-js",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Transpile wasm binary to JavaScript code.",
-  "main": "wasmto-js.mjs",
+  "main": "./wasmto-js.js",
+  "type": "module",
+  "module": "./wasmto-js.js",
+  "exports": {
+    "import": "./wasmto-js.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test",
+    "prepare": "make"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yskszk63/wasmto-js.git"
   },
   "bin": {
-    "wasmto-js": "./bin/wasmto-js"
+    "wasmto-js": "./bin/cli.js"
   },
   "keywords": [
     "wasm"

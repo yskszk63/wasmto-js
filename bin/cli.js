@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 (async () => {
-    const { compile } = await import('../wasmto-js.mjs');
+    const { compile } = await import('../wasmto-js.js');
     const fs = await import('fs');
 
     const mod = await compile();
