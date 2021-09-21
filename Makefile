@@ -25,7 +25,7 @@ $(JS_BIN): $(WASM_BIN)
 	wasm-opt -Os -o - $<|wasmtime $< > $@
 
 $(WASM_BIN): $(SRC)
-	v -m32 -cc clang -cflags '$(CFLAGS) -o $@' -o $@ $<
+	v -prod -m32 -cc clang -cflags '$(CFLAGS) -o $@' -o $@ $<
 
 clean:
 	$(RM) $(TARGETS)
