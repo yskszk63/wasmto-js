@@ -13,7 +13,8 @@
   },
   "scripts": {
     "test": "make test",
-    "prepare": "make"
+    "prepare": "make",
+    "fuzz": "jsfuzz it/fuzz.cjs"
   },
   "repository": {
     "type": "git",
@@ -33,7 +34,9 @@
   "homepage": "https://github.com/yskszk63/wasmto-js#readme",
   "devDependencies": {
     "@types/node": "^16.9.6",
-    "esbuild": "^0.12.28"
+    "esbuild": "^0.12.28",
+    "jsfuzz": "^1.0.15",
+    "nyc": "^15.1.0"
   },
   "dependencies": {
     "@webassemblyjs/ast": "^1.11.1",
