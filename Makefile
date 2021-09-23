@@ -1,6 +1,6 @@
 WASI_SYSROOT = /opt/wasi-sdk/wasi-sysroot
 
-SRC = src/index.ts src/stream.ts src/wasmto-js.ts $(FRAGMENTS_JS)
+SRC = src/index.ts src/stream.ts src/wasmto-js.ts src/wasmto-dts.ts $(FRAGMENTS_JS)
 JS_BIN = dist/wasmto-js.js
 FRAGMENTS_JS = gen/fragments.ts
 TARGETS = $(JS_BIN) tests/example.wasm tests/example.wasm.js

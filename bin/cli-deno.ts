@@ -5,7 +5,10 @@ import { stdin, stdout, wasmtoJs, wasmtoDts } from '../dist/wasmto-js.js';
 const reader = stdin();
 const writer = stdout();
 
-//await wasmtoJs(reader, writer);
-
-window.Buffer = Buffer;
-await wasmtoDts(reader, writer);
+const dts = Deno.args.some(item => item === '--dts');
+if (dts) {
+    Object.assign(window, { Buffer, });
+    await wasmtoDts(reader, writer);
+} else {
+    await wasmtoJs(reader, writer);
+}
