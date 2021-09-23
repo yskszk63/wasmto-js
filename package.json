@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "@webassemblyjs/ast": "^1.11.1",
-    "@webassemblyjs/wasm-parser": "^1.11.1",
-    "wasmparser": "^5.3.0"
+    "@webassemblyjs/wasm-parser": "^1.11.1"
   }
 }
