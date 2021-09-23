@@ -1,9 +1,6 @@
-tests/example.mjs
-tests/example.wasm
-wasmto-js.mjs
-wasmto-js.wasm
-wasmto-js.js
-tests/example.wasm.js
+it/example.wasm
+it/example.wasm.d.ts
+it/example.wasm.js
 gen/
 node_modules/
-tests/example.wasm.d.ts
+dist/

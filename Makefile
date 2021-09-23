@@ -4,7 +4,7 @@ SRC = src/index.ts src/stream.ts src/wasmto-js.ts src/wasmto-dts.ts $(FRAGMENTS_
 JS_BIN = dist/wasmto-js.js
 FRAGMENTS_JS = gen/fragments.ts
 TARGETS = $(JS_BIN)
-TEST_TARGETS = tests/example.wasm tests/example.wasm.js tests/example.wasm.d.ts
+TEST_TARGETS = it/example.wasm it/example.wasm.js it/example.wasm.d.ts
 
 .SUFFIXES: .wat .wasm .wasm.js .wasm.d.ts
 
@@ -21,9 +21,9 @@ TEST_TARGETS = tests/example.wasm tests/example.wasm.js tests/example.wasm.d.ts
 all: $(JS_BIN)
 
 .PHONY: test
-test: tests/example.wasm.js tests/example.wasm.d.ts
-	deno run tests/deno-test.ts
-	node tests/node-test.mjs
+test: it/example.wasm.js it/example.wasm.d.ts
+	deno run it/deno-test.ts
+	node it/node-test.mjs
 
 $(TEST_TARGETS): $(JS_BIN)
 
@@ -40,4 +40,4 @@ $(FRAGMENTS_JS): src/fragment_compile.js
 
 .PHONY: clean
 clean:
-	$(RM) $(TARGETS)
+	$(RM) $(TARGETS) $(TEST_TARGETS)
