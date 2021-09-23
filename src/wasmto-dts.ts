@@ -174,9 +174,9 @@ export async function wasmtoDts(input: ReadableStream<Uint8Array>, output: Writa
             },
         });
 
-        await writer.write("declare function compile(): Promise<WebAssembly.Module>\n");
+        await writer.write("export declare function compile(): Promise<WebAssembly.Module>\n");
         await writer.write("\n");
-        await writer.write("type Exports = {\n");
+        await writer.write("export type Exports = {\n");
         for (const gen of generators) {
             await writer.write("  ");
             await gen.gen(writer);

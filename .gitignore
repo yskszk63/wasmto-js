@@ -6,3 +6,4 @@ wasmto-js.js
 tests/example.wasm.js
 gen/
 node_modules/
+tests/example.wasm.d.ts

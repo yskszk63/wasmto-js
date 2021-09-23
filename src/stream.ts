@@ -111,7 +111,7 @@ export class IntoGeneratorCodeTransformStream extends TransformStream<string, st
                     headerWritten = true;
                     controller.enqueue(header);
                 }
-                controller.enqueue(`  yield "${chunk};"${"\n"}`);
+                controller.enqueue(`  yield "${chunk}";${"\n"}`);
             },
             flush(controller) {
                 if (!headerWritten) {
