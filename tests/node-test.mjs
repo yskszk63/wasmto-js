@@ -1,4 +1,4 @@
-import { compile } from './example.mjs';
+import { compile } from './example.wasm.js';
 
 const mod = await compile();
 const instance = await WebAssembly.instantiate(mod, {});

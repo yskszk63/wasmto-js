@@ -1,16 +1,15 @@
 {
   "name": "wasmto-js",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "description": "Transpile wasm binary to JavaScript code.",
   "main": "./wasmto-js.js",
   "type": "module",
-  "module": "./wasmto-js.js",
-  "types": "./wasmto-js.d.ts",
+  "module": "./dist/wasmto-js.js",
+  "types": "./dist/wasmto-js.d.ts",
   "exports": {
     ".": {
-      "import": "./wasmto-js.js"
-    },
-    "./wasmto-js.wasm": "./wasmto-js.wasm"
+      "import": "./dist/wasmto-js.js"
+    }
   },
   "scripts": {
     "test": "make test",
@@ -21,7 +20,7 @@
     "url": "git+https://github.com/yskszk63/wasmto-js.git"
   },
   "bin": {
-    "wasmto-js": "./bin/cli.js"
+    "wasmto-js": "./bin/cli-node.js"
   },
   "keywords": [
     "wasm"
@@ -31,5 +30,14 @@
   "bugs": {
     "url": "https://github.com/yskszk63/wasmto-js/issues"
   },
-  "homepage": "https://github.com/yskszk63/wasmto-js#readme"
+  "homepage": "https://github.com/yskszk63/wasmto-js#readme",
+  "devDependencies": {
+    "@types/node": "^16.9.6",
+    "esbuild": "^0.12.28"
+  },
+  "dependencies": {
+    "@webassemblyjs/ast": "^1.11.1",
+    "@webassemblyjs/wasm-parser": "^1.11.1",
+    "wasmparser": "^5.3.0"
+  }
 }

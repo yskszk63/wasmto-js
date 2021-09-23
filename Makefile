@@ -1,31 +1,40 @@
 WASI_SYSROOT = /opt/wasi-sdk/wasi-sysroot
 
-SRC = main.v
-WASM_BIN = wasmto-js.wasm
-JS_BIN = wasmto-js.js
-TARGETS = $(WASM_BIN) $(JS_BIN) tests/example.wasm tests/example.mjs
+SRC = src/index.ts src/stream.ts src/wasmto-js.ts $(FRAGMENTS_JS)
+JS_BIN = dist/wasmto-js.js
+FRAGMENTS_JS = gen/fragments.ts
+TARGETS = $(JS_BIN) tests/example.wasm tests/example.wasm.js
 
-CFLAGS = --target=wasm32-wasi --sysroot=$(WASI_SYSROOT) -I$(CURDIR)/stub -D_WASI_EMULATED_SIGNAL -lwasi-emulated-signal -DWNOHANG=1 -O2
+.SUFFIXES: .wat .wasm .wasm.js
 
-.PHONY: all clean test
-
-all: $(TARGETS)
-
-test: tests/example.mjs
-	deno run tests/deno-test.ts
-	node tests/node-test.mjs
-
-tests/example.mjs: tests/example.wasm $(WASM_BIN)
-	wasmtime $(WASM_BIN) < $< > $@
-
-tests/example.wasm: tests/example.wat
+.wat.wasm:
 	wat2wasm -o $@ $<
 
-$(JS_BIN): $(WASM_BIN)
-	wasm-opt -Os -o - $<|wasmtime $< > $@
+.wasm.wasm.js:
+	deno run bin/cli-deno.js < $< > $@
 
-$(WASM_BIN): $(SRC)
-	v -prod -m32 -cc clang -cflags '$(CFLAGS) -o $@' -o $@ $<
+.PHONY: all
+all: $(TARGETS)
 
+.PHONY: test
+test: tests/example.wasm.js
+	deno run tests/deno-test.ts $<
+	node tests/node-test.mjs $<
+
+tests/example.mjs: tests/example.wasm $(WASM_BIN)
+	$(WASM_BIN) < $< > $@
+
+$(JS_BIN): $(SRC)
+	mkdir -p dist
+	npx esbuild $< --bundle --outfile=$@ --format=esm --minify --external:node:\* --external:fs
+	#npx esbuild $< --bundle --outfile=$@ --format=esm --external:node:\* --external:fs
+
+$(FRAGMENTS_JS): src/fragment_compile.js
+	mkdir -p gen
+	echo -n 'export const compile = atob("' > $@
+	base64 -w0 src/fragment_compile.js >> $@
+	echo '");' >> $@
+
+.PHONY: clean
 clean:
 	$(RM) $(TARGETS)
