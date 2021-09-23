@@ -99,6 +99,73 @@ if (typeof process !== "undefined") {
   // browser
 }
 
+export class CheckWasmHeaderTransformStream
+  extends TransformStream<Uint8Array, Uint8Array> {
+  constructor() {
+    let check: ((c: Uint8Array) => boolean) | null = (() => {
+      const buf = new Uint8Array(8);
+      let pos = 0;
+      return function(c: Uint8Array): boolean {
+        const n = Math.min(buf.length - pos, c.length);
+        buf.set(new Uint8Array(c.buffer, 0, n), pos);
+        pos += n;
+        if (pos === buf.length) {
+          const [m1, m2, m3, m4, v1, v2, v3, v4] = buf;
+          if (m1 !== 0x00 || m2 !== 0x61 || m3 !== 0x73 || m4 !== 0x6d) {
+            throw new Error("invalid WASM header.");
+          }
+          if (v1 !== 0x01 || v2 !== 0x00 || v3 !== 0x00 || v4 !== 0x00) {
+            throw new Error("unsupported WASM version.");
+          }
+          return true;
+        }
+        return false;
+      }
+    })();
+    super({
+      transform(chunk, controller) {
+        if (check && check(chunk)) {
+          check = null;
+        }
+        controller.enqueue(chunk);
+      },
+
+      flush(_controller) {
+        if (check) {
+          throw new Error("could not detect WASM or not.");
+        }
+      },
+    });
+  }
+}
+
+export class WindowingTransformStream
+  extends TransformStream<Uint8Array, Uint8Array> {
+  constructor(len: number) {
+    const buf = new Uint8Array(len);
+    let pos = 0;
+    super({
+      transform(chunk, controller) {
+        const l = chunk.length;
+        let p = 0;
+        while (p < l) {
+          const n = Math.min(len - pos, l - p);
+          buf.set(new Uint8Array(chunk.buffer, p, n), pos);
+          p += n;
+          pos += n;
+          if (pos === len) {
+            controller.enqueue(buf.slice(0, pos));
+            pos = 0;
+          }
+        }
+      },
+      flush(controller) {
+        controller.enqueue(buf.slice(0, pos));
+      },
+    });
+  }
+}
+
 export class Base64TransformStream
   extends TransformStream<Iterable<number>, string> {
   constructor() {
