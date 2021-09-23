@@ -4,7 +4,7 @@ for await (const conn of srv) {
     const path = new URL(evt.request.url).pathname;
     switch (path) {
     case '/':
-      evt.respondWith(new Response(Deno.readTextFileSync("./tests/browser-test.html"), {
+      evt.respondWith(new Response(Deno.readTextFileSync(new URL("./browser-test.html", import.meta.url)), {
         headers: {
           'Content-Type': 'text/html',
           'Cross-Origin-Opener-Policy': 'same-origin',
@@ -14,15 +14,15 @@ for await (const conn of srv) {
       break;
 
     case '/node-test.mjs':
-      evt.respondWith(new Response(Deno.readTextFileSync("./tests/node-test.mjs"), {
+      evt.respondWith(new Response(Deno.readTextFileSync(new URL("./node-test.mjs", import.meta.url)), {
         headers: {
           'Content-Type': 'application/javascript',
         },
       }));
       break;
 
-    case '/example.mjs':
-      evt.respondWith(new Response(Deno.readTextFileSync("./tests/example.mjs"), {
+    case '/example.wasm.js':
+      evt.respondWith(new Response(Deno.readTextFileSync(new URL("./example.wasm.js", import.meta.url)), {
         headers: {
           'Content-Type': 'application/javascript',
         },
