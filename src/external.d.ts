@@ -1,7 +1,7 @@
 declare module "@webassemblyjs/wasm-parser" {
     import {Program} from "@webassemblyjs/ast";
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/wasm-parser/src/index.js#L160
-    declare function decode(buf: ArrayBuffer, customOpts: Object): Program;
+    declare function decode(buf: ArrayBuffer, customOpts: Record<string, unknown>): Program;
 }
 
 declare module "@webassemblyjs/ast" {
@@ -72,7 +72,7 @@ declare module "@webassemblyjs/ast" {
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/ast/src/types/nodes.js#L398
     type Func = {
         type: "Func",
-        name: ?Index,
+        name: Index | null,
         signature: SignatureOrTypeRef,
     };
 
@@ -100,19 +100,19 @@ declare module "@webassemblyjs/ast" {
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/ast/src/types/nodes.js#L302
     type Memory = {
         type: "Memory",
-        id: ?Index,
+        id: Index | null,
     };
 
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/ast/src/types/nodes.js#L285
     type Global = {
         type: "Global",
-        name: ?Identifier,
+        name: Identifier | null,
     };
 
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/ast/src/types/nodes.js#L293
     type Table = {
         type: "Table",
-        name: ?Identifier,
+        name: Identifier | null,
     };
 
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/ast/src/types/nodes.js#L346
@@ -124,7 +124,7 @@ declare module "@webassemblyjs/ast" {
 
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/ast/src/types/basic.js#L70
     type FuncParam = {
-        id: ?string,
+        id: string | null,
         valtype: Valtype,
     };
 
@@ -140,8 +140,7 @@ declare module "@webassemblyjs/ast" {
         node: T,
     };
 
-    type NodePathOperations = {
-    }
+    type NodePathOperations = Record<string, never>;
 
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/ast/src/types/traverse.js#L26
     type NodePath<T> = NodePathContext<T> & NodePathOperations;
@@ -150,5 +149,5 @@ declare module "@webassemblyjs/ast" {
     type TraverseCallback = (type: string, path: NodePath<Node>) => void;
 
     // https://github.com/xtuc/webassemblyjs/blob/7a0b8b8fdeeb3990fb9e4215b0ff8bce3f2f81c1/packages/ast/src/traverse.js#L63
-    declare function traverse(node: Node, visitors: Object, before?: TraverseCallback, after?: TraverseCallback): void;
+    declare function traverse(node: Node, visitors: Record<string, unknown>, before?: TraverseCallback, after?: TraverseCallback): void;
 }

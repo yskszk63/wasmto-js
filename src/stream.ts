@@ -1,4 +1,4 @@
-declare var Deno: {
+declare const Deno: {
     stdin: {
         read(p: Uint8Array): Promise<number | null>,
     },
@@ -10,8 +10,14 @@ declare var Deno: {
 export let stdin: () => ReadableStream<Uint8Array> = () => { throw new Error("stub"); }
 export let stdout: () => WritableStream<Uint8Array> = () => { throw new Error("stub"); }
 
+declare module 'node:stream/web' {
+    export const TransformStream: TransformStream;
+    export const ReadableStream: ReadableStream;
+    export const WritableStream: WritableStream;
+    export const TextEncoderStream: TextEncoderStream;
+}
+
 if (typeof process !== 'undefined') {
-    // @ts-ignore
     const { TransformStream, ReadableStream, WritableStream, TextEncoderStream } = await import('node:stream/web');
     Object.assign(global, {
         TransformStream,
@@ -34,7 +40,7 @@ if (typeof process !== 'undefined') {
                     controller.enqueue(value);
                 }
             },
-            // @ts-ignore
+            // @ts-ignore: needs type='bytes' UnderlyingSource, but not found.
             type: 'bytes',
         });
     }
@@ -52,7 +58,7 @@ if (typeof process !== 'undefined') {
                     });
                 });
             },
-        } as UnderlyingSink);
+        });
     }
 
 } else if (typeof Deno !== 'undefined') {
@@ -69,7 +75,7 @@ if (typeof process !== 'undefined') {
                     controller.close();
                 }
             },
-            // @ts-ignore
+            // @ts-ignore: needs type='bytes' UnderlyingSource, but not found.
             type: 'bytes',
         });
     }
