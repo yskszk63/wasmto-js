@@ -111,6 +111,11 @@ export async function wasmtoDts(
       "export declare function compile(): Promise<WebAssembly.Module>\n",
     );
     await writer.write("\n");
+    await writer.write("export type i32 = number;\n");
+    await writer.write("export type i64 = BigInt;\n");
+    await writer.write("export type i32 = number;\n");
+    await writer.write("export type i32 = number;\n");
+    await writer.write("\n");
     await writer.write("export type Exports = {\n");
     for (const gen of generators) {
       await writer.write("  ");
