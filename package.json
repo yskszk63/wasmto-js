@@ -1,11 +1,11 @@
 {
   "name": "wasmto-js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Transpile wasm binary to JavaScript code.",
   "main": "./wasmto-js.js",
   "type": "module",
   "module": "./dist/wasmto-js.js",
-  "types": "./dist/wasmto-js.d.ts",
+  "types": "./wasmto-js.d.ts",
   "exports": {
     ".": {
       "import": "./dist/wasmto-js.js"
