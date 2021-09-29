@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { stdin, stdout, wasmtoJs, wasmtoDts } from 'wasmto-js';
 
 const reader = stdin();
