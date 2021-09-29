@@ -1,7 +1,4 @@
-/// <reference path="./external.d.ts" />
-
-import { decode } from "@webassemblyjs/wasm-parser";
-import * as ast from "@webassemblyjs/ast";
+import { parse, typeidx, funcidx, functype } from "stream-wasm-parser";
 
 interface Generator {
   gen(output: WritableStreamDefaultWriter<string>): Promise<void>;
@@ -9,51 +6,27 @@ interface Generator {
 
 class FuncGen {
   name: string;
-  sig: ast.Signature;
-  constructor(name: string, sig: ast.Signature) {
+  type: functype;
+  constructor(name: string, type: functype) {
     this.name = name;
-    this.sig = sig;
+    this.type = type;
   }
   async gen(output: WritableStreamDefaultWriter<string>): Promise<void> {
-    const typemap: { [P in ast.Valtype]: string | null } = {
-      "i32": "number",
-      "f32": "number",
-      "u32": "number",
-      "i64": "BigInt",
-      "f64": "BigInt",
-      "label": null,
-    };
-
-    function toJsType(t: ast.Valtype[]): string {
-      const [first, ...rest] = t;
-      if (typeof first === "undefined") {
-        return "void";
-      }
-      if (rest.length > 0) {
-        throw new Error("tuple return not supported.");
-      }
-      const result = typemap[first];
-      if (!result) {
-        throw new Error("unknown valtype");
-      }
-      return result;
+    const params = this.type.val.parameters.map((t, i) => `p${i}: ${t}`).join(', ');
+    switch (this.type.val.results.length) {
+    case 0: {
+      await output.write(`${this.name}(${params}): void`);
+      break;
     }
-
-    function toJsSig(t: ast.FuncParam[]): string {
-      return t.map((item, n) => {
-        const ty = typemap[item.valtype];
-        if (!ty) {
-          throw new Error("unknown valtype");
-        }
-        return `p${n}: ${ty}`;
-      }).join(", ");
+    case 1: {
+      await output.write(`${this.name}(${params}): ${this.type.val.results[0]}`);
+      break;
     }
-
-    await output.write(
-      `${this.name}(${toJsSig(this.sig.params)}): ${
-        toJsType(this.sig.results)
-      };`,
-    );
+    default: {
+      await output.write(`${this.name}(${params}): ${this.type.val.results.join(', ')}`);
+      break;
+    }
+    }
   }
 }
 
@@ -73,122 +46,67 @@ export async function wasmtoDts(
   input: ReadableStream<Uint8Array>,
   output: WritableStream<Uint8Array>,
 ) {
-  const contents: number[] = [];
-  const reader = input.getReader();
-  let result = await reader.read();
-  while (!result.done) {
-    contents.push(...result.value);
-    result = await reader.read();
+  const types = new Map<typeidx, functype>();
+  const funcs = new Map<funcidx, typeidx>();
+  const generators: Generator[] = [];
+
+  for await (const sec of parse(input)) {
+    switch (sec.tag) {
+    case 'type': {
+      types.set(sec.val.index, sec.val.val);
+      break;
+    }
+    case 'func': {
+      funcs.set(sec.val.index, sec.val.val);
+      break;
+    }
+    case 'import': {
+      const desc = sec.val.desc;
+      switch (desc.tag) {
+      case 'func': {
+        funcs.set(desc.val.index, desc.val.val);
+        break;
+      }
+      }
+      break;
+    }
+    case 'export': {
+      const desc = sec.val.desc;
+      switch (desc.tag) {
+      case 'func': {
+        const func = funcs.get(desc.val);
+        if (typeof func === 'undefined') {
+          throw new Error("no function found.");
+        }
+        const fty = types.get(func);
+        if (typeof fty === 'undefined') {
+          throw new Error("no function type found.");
+        }
+        generators.push(new FuncGen(sec.val.name, fty));
+        break;
+      }
+      case 'mem': {
+        generators.push(new GeneralGen(sec.val.name, "WebAssembly.Memory"));
+        break;
+      }
+      case 'table': {
+        generators.push(new GeneralGen(sec.val.name, "WebAssembly.Table"));
+        break;
+      }
+      case 'global': {
+        generators.push(new GeneralGen(sec.val.name, "WebAssembly.Global"));
+        break;
+      }
+      }
+      break;
+    }
+    }
   }
-  const program = decode(Uint8Array.from(contents).buffer, {
-    ignoreCodeSection: true,
-    ignoreDataSection: true,
-  });
 
   const { readable, writable } = new TextEncoderStream();
   const pipetask = readable.pipeTo(output);
   const writer = writable.getWriter();
   try {
-    const funcs: ast.SignatureOrTypeRef[] = [];
-    const funcByName: { [P in string]: ast.SignatureOrTypeRef } = {};
-    const memory: ast.Memory[] = [];
-    const globals: ast.Global[] = [];
-    const tables: ast.Table[] = [];
-
-    const generators: Generator[] = [];
-
-    ast.traverse(program, {
-      ModuleExport(path?: ast.NodePath<ast.Node>) {
-        if (path?.node?.type === "ModuleExport") {
-          const desc = path.node.descr;
-          switch (desc.exportType) {
-            case "Func":
-              switch (desc.id.type) {
-                case "NumberLiteral":
-                  {
-                    const sig = funcs[desc.id.value];
-                    if (sig.type === "Signature") {
-                      generators.push(new FuncGen(path.node.name, sig));
-                    } else {
-                      throw new Error("signature ref not implemented.");
-                    }
-                  }
-                  break;
-
-                case "Identifier":
-                  {
-                    const sig = funcByName[desc.id.value];
-                    if (sig.type === "Signature") {
-                      generators.push(new FuncGen(path.node.name, sig));
-                    } else {
-                      throw new Error("signature ref not implemented.");
-                    }
-                  }
-                  break;
-              }
-              break;
-
-            case "Mem":
-              generators.push(
-                new GeneralGen(path.node.name, "WebAssembly.Memory"),
-              );
-              break;
-
-            case "Global":
-              generators.push(
-                new GeneralGen(path.node.name, "WebAssembly.Global"),
-              );
-              break;
-
-            case "Table":
-              generators.push(
-                new GeneralGen(path.node.name, "WebAssembly.Table"),
-              );
-              break;
-
-            default:
-              throw new Error("unknown export type.");
-          }
-        }
-      },
-
-      Func(path?: ast.NodePath<ast.Node>) {
-        if (path?.node?.type === "Func") {
-          const func = path.node;
-          funcs.push(func.signature);
-          if (func.name?.type === "Identifier") {
-            const name = func.name.value;
-            funcByName[name] = func.signature;
-          }
-        }
-      },
-
-      FuncImportDescr(path?: ast.NodePath<ast.Node>) {
-        if (path?.node?.type === "FuncImportDescr") {
-          const func = path.node;
-          funcs.push(func.signature);
-        }
-      },
-
-      Memory(path?: ast.NodePath<ast.Node>) {
-        if (path?.node?.type === "Memory") {
-          memory.push(path.node);
-        }
-      },
-
-      Global(path?: ast.NodePath<ast.Node>) {
-        if (path?.node?.type === "Global") {
-          globals.push(path.node);
-        }
-      },
-
-      Table(path?: ast.NodePath<ast.Node>) {
-        if (path?.node?.type === "Table") {
-          tables.push(path.node);
-        }
-      },
-    });
-
     await writer.write(
       "export declare function compile(): Promise<WebAssembly.Module>\n",
     );

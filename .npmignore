@@ -1,4 +1,8 @@
-main.v
 Makefile
-stub
-tests
+it/
+src/
+tsconfig.json
+coverage/
+gen/
+.stryker-tmp/
+.nyc_output/
