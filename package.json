@@ -37,6 +37,6 @@
     "nyc": "^15.1.0"
   },
   "dependencies": {
-    "stream-wasm-parser": "^0.1.0-alpha.0"
+    "stream-wasm-parser": "^1.0.0"
   }
 }
