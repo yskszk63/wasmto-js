@@ -113,8 +113,8 @@ export async function wasmtoDts(
     await writer.write("\n");
     await writer.write("export type i32 = number;\n");
     await writer.write("export type i64 = BigInt;\n");
-    await writer.write("export type i32 = number;\n");
-    await writer.write("export type i32 = number;\n");
+    await writer.write("export type f32 = number;\n");
+    await writer.write("export type f64 = number;\n");
     await writer.write("\n");
     await writer.write("export type Exports = {\n");
     for (const gen of generators) {
