@@ -1,6 +1,6 @@
 {
   "name": "wasmto-js",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Transpile wasm binary to JavaScript code.",
   "main": "./dist/wasmto-js.js",
   "type": "module",
