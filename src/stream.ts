@@ -1,12 +1,3 @@
-declare const Deno: {
-  stdin: {
-    read(p: Uint8Array): Promise<number | null>;
-  };
-  stdout: {
-    write(p: Uint8Array): Promise<number>;
-  };
-} | undefined;
-
 export let stdin: () => ReadableStream<Uint8Array> = () => {
   throw new Error("stub");
 };
@@ -58,38 +49,8 @@ if (typeof process !== "undefined") {
       },
     });
   };
-} else if (typeof Deno !== "undefined") {
-  // deno
-  stdin = () => {
-    const stdin = Deno!.stdin;
-    const buf = new Uint8Array(4096);
-    return new ReadableStream({
-      async pull(controller) {
-        const r = await stdin.read(buf);
-        if (r !== null) {
-          controller.enqueue(buf.slice(0, r));
-        } else {
-          controller.close();
-        }
-      },
-      // @ts-ignore: needs type='bytes' UnderlyingSource, but not found.
-      type: "bytes",
-    });
-  };
-  stdout = () => {
-    const stdout = Deno!.stdout;
-    return new WritableStream({
-      async write(chunk, _controller) {
-        let rest = chunk.byteLength;
-        while (rest > 0) {
-          const n = await stdout.write(chunk.slice(0, rest));
-          rest -= n;
-        }
-      },
-    });
-  };
 } else {
-  // browser
+  // Deno or browser
 }
 
 export class CheckWasmHeaderTransformStream
