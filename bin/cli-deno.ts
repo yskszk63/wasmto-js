@@ -1,3 +1,4 @@
+// @ts-nocheck :deno
 import { Buffer } from 'https://deno.land/x/std@0.108.0/node/buffer.ts';
 // @deno-types="../wasmto-js.d.ts"
 import { stdin, stdout, wasmtoJs, wasmtoDts } from '../dist/wasmto-js.js';

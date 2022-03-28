@@ -1,3 +1,4 @@
+// @ts-nocheck : deno
 const srv = Deno.listen({ port: 8080 });
 for await (const conn of srv) {
   for await (const evt of Deno.serveHttp(conn)) {

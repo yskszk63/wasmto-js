@@ -14,13 +14,6 @@ export let stdout: () => WritableStream<Uint8Array> = () => {
   throw new Error("stub");
 };
 
-declare module "node:stream/web" {
-  export const TransformStream: TransformStream;
-  export const ReadableStream: ReadableStream;
-  export const WritableStream: WritableStream;
-  export const TextEncoderStream: TextEncoderStream;
-}
-
 if (typeof process !== "undefined") {
   const { TransformStream, ReadableStream, WritableStream, TextEncoderStream } =
     await import("node:stream/web");
