@@ -33,8 +33,7 @@
   "devDependencies": {
     "@types/node": "^17.0.23",
     "esbuild": "^0.14.28",
-    "jsfuzz": "^1.0.15",
-    "nyc": "^15.1.0"
+    "jsfuzz": "^1.0.15"
   },
   "dependencies": {
     "stream-wasm-parser": "^1.0.0"

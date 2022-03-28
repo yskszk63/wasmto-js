@@ -5,7 +5,7 @@ import {
   IntoGeneratorCodeTransformStream,
   WindowingTransformStream,
 } from "./stream";
-import { compile } from "../gen/fragments";
+import fragments from "./fragment_compile.js.txt" assert { type: "text" };
 
 export async function wasmtoJs(
   input: ReadableStream<Uint8Array>,
@@ -16,7 +16,7 @@ export async function wasmtoJs(
     .pipeThrough(new WindowingTransformStream(4096))
     .pipeThrough(new Base64TransformStream())
     .pipeThrough(new IntoGeneratorCodeTransformStream())
-    .pipeThrough(new AppendTrailerTransformStream(compile))
+    .pipeThrough(new AppendTrailerTransformStream(fragments))
     .pipeThrough(new TextEncoderStream())
     .pipeTo(output);
 }
