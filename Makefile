@@ -28,6 +28,11 @@ $(JS_BIN): $(SRC)
 	mkdir -p dist
 	npx esbuild $< --bundle --outfile=$@ --format=esm --minify --external:node:\*
 
+.PHONY: check
+check:
+	npx tsc
+	deno lint
+
 .PHONY: clean
 clean:
 	$(RM) $(TARGETS) $(TEST_TARGETS)
