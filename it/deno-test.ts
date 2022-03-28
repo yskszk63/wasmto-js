@@ -1,3 +1,4 @@
+// @ts-nocheck : deno
 // @deno-types="./example.wasm.d.ts"
 import { compile, Exports } from './example.wasm.js';
 
